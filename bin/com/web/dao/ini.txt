@@ -1,0 +1,6 @@
+驱动名: com.mysql.cj.jdbc.Driver
+数据库: mysql
+端口号: 3306
+数据库: moviesDatabase
+用户名: root
+密码: 123
