@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.sql.Date;
 
 public class Movie implements Serializable{
-	private String cno;	//出品公司编号
-	private String mno;	//电影编号
+	private int cno;	//出品公司编号
+	private int mno;	//电影编号
 	private String mname;	//电影名称
 	private Date myear;	//发行年份
 	private int mduration;	//时长
@@ -17,10 +17,10 @@ public class Movie implements Serializable{
 	private String introduction;	//电影简介
 	
 	//getter、setter方法
-	public String getCno() {
+	public int getCno() {
 		return cno;
 	}
-	public String getMno() {
+	public int getMno() {
 		return mno;
 	}
 	public String getMname() {
@@ -50,10 +50,10 @@ public class Movie implements Serializable{
 	public String getIntroduction() {
 		return introduction;
 	}
-	public void setCno(String cno) {
+	public void setCno(int cno) {
 		this.cno = cno;
 	}
-	public void setMno(String mno) {
+	public void setMno(int mno) {
 		this.mno = mno;
 	}
 	public void setMname(String mname) {

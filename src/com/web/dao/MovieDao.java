@@ -1,6 +1,7 @@
 package com.web.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,8 +59,8 @@ public class MovieDao {
 			ResultSet rs = pst.executeQuery();
 			while (rs.next()) {
 				Movie movie = new Movie();
-				movie.setCno(rs.getString("cno"));
-				movie.setMno(rs.getString("mno"));
+				movie.setCno(rs.getInt("cno"));
+				movie.setMno(rs.getInt("mno"));
 				movie.setMname(rs.getString("mname"));
 				movie.setMyear(rs.getDate("myear"));
 				movie.setMduration(rs.getInt("mduration"));
@@ -84,8 +85,8 @@ public class MovieDao {
 		PreparedStatement pst;
 		try {
 			pst = conn.prepareStatement(sql);
-			pst.setString(1, movie.getCno());
-			pst.setString(2, movie.getMno());
+			pst.setInt(1, movie.getCno());
+			pst.setInt(2, movie.getMno());
 			pst.setString(3, movie.getMname());
 			pst.setDate(4, movie.getMyear());
 			pst.setInt(5, movie.getMduration());
@@ -126,7 +127,7 @@ public class MovieDao {
 		PreparedStatement pst;
 		try {
 			pst = conn.prepareStatement(sql);
-			pst.setString(1, movie.getCno());
+			pst.setInt(1, movie.getCno());
 			pst.setString(2, movie.getMname());
 			pst.setDate(3, movie.getMyear());
 			pst.setInt(4, movie.getMduration());
@@ -136,14 +137,66 @@ public class MovieDao {
 			pst.setInt(8, movie.getCnt());
 			pst.setInt(9, movie.getCommentcnt());
 			pst.setString(10, movie.getIntroduction());
-			pst.setString(11, movie.getMno());
+			pst.setInt(11, movie.getMno());
 			int count = pst.executeUpdate();
-			pst.close(); // 关闭
+			pst.close(); // 关闭s
 			return count > 0 ? true : false; // 是否修改的判断
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public Movie getMovieByMno(int mno){
+		Movie movie = new Movie();
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "select * from movie where mno = "+mno; // SQL查询语句
+			PreparedStatement pst = conn.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				movie.setCno(rs.getInt("cno"));
+				movie.setMno(rs.getInt("mno"));
+				movie.setMname(rs.getString("mname"));
+				movie.setMyear(rs.getDate("myear"));
+				movie.setMduration(rs.getInt("mduration"));
+				movie.setStar(rs.getInt("star"));
+				movie.setPoint(rs.getInt("point"));
+				movie.setCgrade(rs.getInt("cgrade"));
+				movie.setCnt(rs.getInt("cnt"));
+				movie.setCommentcnt(rs.getInt("commentcnt"));
+				movie.setIntroduction(rs.getString("introduction"));
+			}
+			rs.close(); // 关闭
+			pst.close(); // 关闭
+		} catch (SQLException e) {
+			e.printStackTrace(); // 抛出异常
+		}
+		return movie;
+	}
+	
+	public List<Movie> getMovieByDate(String date1, String date2) {
+		List<Movie> list = new ArrayList<>();
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "";
+			if (Date.valueOf(date1).before(Date.valueOf(date2))) {
+				sql = "SELECT mno FROM movie WHERE myear >= '"+ date1+ "' AND myear <= '" + date2 + "'";
+			}
+			else {
+				sql = "SELECT mno FROM movie WHERE myear >= '"+ date2+ "' AND myear <= '" + date1 + "'";
+			}
+			PreparedStatement pst = conn.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				Movie movie = new Movie();
+				movie = getMovieByMno(rs.getInt("mno"));
+				list.add(movie);
+			}
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 }

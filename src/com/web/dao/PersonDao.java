@@ -104,4 +104,23 @@ public class PersonDao {
 		}
 		return false;
 	}
+	public Person getPersonByPno(int pno) {
+		Person person = new Person();
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "select * from person where pno = "+pno; // SQL查询语句
+			PreparedStatement pst = conn.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				person.setPno(rs.getInt("pno"));
+				person.setPname(rs.getString("pname"));
+				person.setPbirth(rs.getDate("pbirth"));
+			}
+			rs.close(); // 关闭
+			pst.close(); // 关闭
+		} catch (SQLException e) {
+			e.printStackTrace(); // 抛出异常
+		}
+		return person;
+	}
 }

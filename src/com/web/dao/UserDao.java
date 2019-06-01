@@ -54,6 +54,20 @@ public class UserDao {
 			// TODO Auto-generated catch block
 			e.printStackTrace();	
 		}
+		//添加user的account
+		sql = "SELECT max(account) FROM `users` WHERE `email`=" + user.getEmail() + " AND `uname`="+user.getUname();
+		try {
+			PreparedStatement pst1 = conn.prepareStatement(sql);
+			ResultSet rs = pst1.executeQuery();
+			while (rs.next()) {
+				user.setAccount(rs.getInt("account"));
+			}
+			rs.close();
+			pst1.close();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
 		return false;
 	}
 	public boolean deleteUser(int account){
@@ -89,6 +103,49 @@ public class UserDao {
 			return count > 0 ? true : false; // 是否修改的判断
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public User getUserByAccount(int account) {
+		User user = new User();
+		
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "select * from users where account = "+account; // SQL查询语句
+			PreparedStatement pst = conn.prepareStatement(sql);
+			System.out.println(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				user.setAccount(rs.getInt("account"));
+				user.setUname(rs.getString("uname"));
+				user.setUpwd(rs.getString("upwd"));
+				user.setEmail(rs.getString("email"));
+				user.setPhone(rs.getString("phone"));
+				user.setU_birth(rs.getDate("u_birth"));
+			}
+			rs.close(); // 关闭
+			pst.close(); // 关闭
+		} catch (SQLException e) {
+			e.printStackTrace(); // 抛出异常
+		}
+		return user;
+	}
+	
+	public boolean judgeUser(int account, String password) {
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "SELECT upwd FROM users WHERE account=" + account;
+			PreparedStatement pst = conn.prepareStatement(sql);
+			System.out.println(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				if((rs.getString("upwd")).equals(password)) {
+					return true;
+				}
+			}
+		}catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return false;

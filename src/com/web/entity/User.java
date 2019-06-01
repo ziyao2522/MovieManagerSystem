@@ -5,10 +5,13 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.web.dao.DbHelper;
+import com.web.dao.MovieDao;
 
 public class User {
 	private int account;
@@ -59,7 +62,7 @@ public class User {
 				+ phone + ", u_birth=" + u_birth + "]";
 	}
 	
-	public void setPoint(int account, int movieno) {
+	public void setPoint(int movieno) {
 		//点赞机制
 		int pointstate = 0;
 		try {
@@ -134,7 +137,7 @@ public class User {
 		}
 	}
 
-	public void setStar(int account, int movieno) {
+	public void setStar(int movieno) {
 		//收藏机制
 		int starstate = 0;
 		try {
@@ -209,7 +212,7 @@ public class User {
 		}
 	}
 	
-	public void setComment(int account, int movieno, int grade, String commenttext) {
+	public void setComment(int movieno, int grade, String commenttext) {
 		//添加评论机制
 		int commentstate = 0;
 		try {
@@ -283,7 +286,7 @@ public class User {
 		}
 	}
 
-	public void deleteComment(int account, int movieno) {
+	public void deleteComment(int movieno) {
 		//删除评论机制
 		Connection conn = DbHelper.getConn();
 		String sql = "DELETE FROM `comments` WHERE account=? AND mno=?";
@@ -299,4 +302,69 @@ public class User {
 		}
 	}
 
+	public List<Movie> getAllPoints(){
+		//返回点赞列表
+		List<Movie> arraylist = new ArrayList<>();
+		MovieDao movieDao = new MovieDao();
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "SELECT * FROM point WHERE account="+account;
+			PreparedStatement pst = conn.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				int mno = rs.getInt("mno");
+				arraylist.add(movieDao.getMovieByMno(mno));
+			}
+			rs.close();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return arraylist;
+		
+	}
+	
+	public List<Movie> getAllStars() {
+		//返回收藏列表
+		List<Movie> arraylist = new ArrayList<>();
+		MovieDao movieDao = new MovieDao();
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "SELECT * FROM star WHERE account="+account;
+			PreparedStatement pst = conn.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				int mno = rs.getInt("mno");
+				arraylist.add(movieDao.getMovieByMno(mno));
+			}
+			rs.close();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return arraylist;
+	}
+
+	public Map<Movie,Comments> getAllComments() {
+		//返回电影，评论。键值对
+		Map<Movie, Comments> map = new HashMap<Movie, Comments>();
+		MovieDao movieDao = new MovieDao();
+		try {
+			Connection conn = DbHelper.getConn();
+			String sql = "SELECT * FROM Comments WHERE account="+account;
+			PreparedStatement pst = conn.prepareStatement(sql);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next()) {
+				int mno = rs.getInt("mno");
+				Comments comment = new Comments();
+				comment.setAccount(rs.getInt("account"));
+				comment.setCgrade(rs.getInt("cgrade"));
+				comment.setMno(rs.getInt("mno"));
+				comment.setCcomment(rs.getString("ccomment"));
+				map.put(movieDao.getMovieByMno(mno), comment);
+			}
+			rs.close();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
 }
